@@ -32,6 +32,8 @@ const contactSchema = new Schema(
   },
 );
 
+export const contactSortFields = ['name'];
+
 contactSchema.post('save', handleSaveError);
 
 contactSchema.pre('findOneAndUpdate', setUpdateSettings);
