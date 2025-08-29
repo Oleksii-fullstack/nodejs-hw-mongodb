@@ -10,8 +10,8 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true, // унікальне поле в рамках колекції
-      match: emailRegexp, // ключ match = поле має відповідати регулярному виразу
+      unique: true,
+      match: emailRegexp,
       required: true,
     },
     password: {

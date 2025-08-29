@@ -12,6 +12,10 @@ export const getContacts = async ({
   const skip = (page - 1) * perPage;
   const query = ContactCollection.find();
 
+  if (filters.userId) {
+    query.where('userId').equals(filters.userId);
+  }
+
   if (filters.type) {
     query.where('contactType').equals(filters.type);
   }
@@ -40,13 +44,12 @@ export const getContacts = async ({
   };
 };
 
-export const getContactById = (contactId) =>
-  ContactCollection.findById(contactId);
+export const getContact = (query) => ContactCollection.findOne(query);
 
 export const addContact = (payload) => ContactCollection.create(payload);
 
-export const updateContactById = async (_id, payload, options = {}) => {
-  const result = await ContactCollection.findOneAndUpdate({ _id }, payload, {
+export const updateContact = async (query, payload, options = {}) => {
+  const result = await ContactCollection.findOneAndUpdate(query, payload, {
     includeResultMetadata: true,
     ...options,
   });
@@ -61,5 +64,5 @@ export const updateContactById = async (_id, payload, options = {}) => {
   };
 };
 
-export const deleteContactById = (id) =>
-  ContactCollection.findByIdAndDelete(id);
+export const deleteContact = (query) =>
+  ContactCollection.findOneAndDelete(query);
