@@ -1,6 +1,12 @@
 import ContactCollection from '../db/models/Contact.js';
 
 import { calcPaginationData } from '../utils/calcPaginationData.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+
+import { saveFileToPublicDir } from '../utils/saveFileToPublicDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+
+const enableCloudinary = getEnvVar('ENABLE_CLOUDINARY') === 'true';
 
 export const getContacts = async ({
   page = 1,
@@ -46,7 +52,17 @@ export const getContacts = async ({
 
 export const getContact = (query) => ContactCollection.findOne(query);
 
-export const addContact = (payload) => ContactCollection.create(payload);
+export const addContact = async (payload, file) => {
+  let photo = null;
+  if (file) {
+    if (enableCloudinary) {
+      photo = await saveFileToCloudinary(file);
+    } else {
+      photo = await saveFileToPublicDir(file);
+    }
+  }
+  return ContactCollection.create({ ...payload, photo });
+};
 
 export const updateContact = async (query, payload, options = {}) => {
   const result = await ContactCollection.findOneAndUpdate(query, payload, {

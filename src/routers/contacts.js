@@ -15,6 +15,7 @@ import {
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { authenticate } from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/upload.js';
 
 const contactsRouter = Router();
 
@@ -24,7 +25,23 @@ contactsRouter.get('/', getContactsController);
 
 contactsRouter.get('/:contactId', isValidId, getContactByIdController);
 
-contactsRouter.post('/', validateBody(contactAddSchema), addContactController);
+contactsRouter.post(
+  '/',
+  // upload.fields([   <--- якщо кілька полів з файлами
+  //   {
+  //     name: 'photo',
+  //     maxCount: 2,
+  //   },
+  //   {
+  //     name: 'poster',
+  //     maxCount: 4,
+  //   },
+  // ]),
+  // upload.array('photo', 4),  <--- якщо в 1 полі кілька файлів
+  upload.single('photo'), // <-- якщо 1 поле і 1 файл | записуємо Перед validate
+  validateBody(contactAddSchema),
+  addContactController,
+);
 
 contactsRouter.put(
   '/:contactId',
