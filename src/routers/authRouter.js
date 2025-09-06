@@ -9,6 +9,7 @@ import {
 } from '../validation/authSchemas.js';
 import {
   registerController,
+  verifyController,
   loginController,
   refreshSessionController,
   logoutUserController,
@@ -19,6 +20,8 @@ import {
 const authRouter = Router();
 
 authRouter.post('/register', validateBody(registerSchema), registerController);
+
+authRouter.get('/verify', verifyController);
 
 authRouter.post('/login', validateBody(loginSchema), loginController);
 

@@ -15,3 +15,30 @@ const transporter = nodemailer.createTransport({
 export const sendEmail = async (options) => {
   return await transporter.sendMail(options);
 };
+
+// import nodemailer from 'nodemailer';
+// import 'dotenv/config';
+// import { getEnvVar } from './getEnvVar.js';
+
+// const host = getEnvVar('SMTP_HOST');
+// const port = getEnvVar('SMTP_PORT');
+// const user = getEnvVar('SMTP_USER');
+// const pass = getEnvVar('SMTP_PASSWORD');
+// const from = getEnvVar('SMTP_FROM');
+
+// const nodemailerConfig = {
+//   host,
+//   port,
+//   secure: true,
+//   auth: {
+//     user,
+//     pass,
+//   },
+// };
+
+// const transport = nodemailer.createTransport(nodemailerConfig);
+
+// export const sendEmail = (payload) => {
+//   const email = { ...payload, from };
+//   return transport.sendMail(email);
+// };

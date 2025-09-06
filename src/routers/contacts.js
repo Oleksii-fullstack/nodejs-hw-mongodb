@@ -27,17 +27,6 @@ contactsRouter.get('/:contactId', isValidId, getContactByIdController);
 
 contactsRouter.post(
   '/',
-  // upload.fields([   <--- якщо кілька полів з файлами
-  //   {
-  //     name: 'photo',
-  //     maxCount: 2,
-  //   },
-  //   {
-  //     name: 'poster',
-  //     maxCount: 4,
-  //   },
-  // ]),
-  // upload.array('photo', 4),  <--- якщо в 1 полі кілька файлів
   upload.single('photo'), // <-- якщо 1 поле і 1 файл | записуємо Перед validate
   validateBody(contactAddSchema),
   addContactController,

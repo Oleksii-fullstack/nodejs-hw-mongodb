@@ -28,6 +28,11 @@ export const createSession = () => ({
 export const findSession = (query) => SessionCollection.findOne(query);
 export const findUser = (query) => UserCollection.findOne(query);
 
+const verifyTemplatePath = path.join(TEMPLATES_DIR, 'verify-email.html'); // <-- читаємо шлях до шаблону верифікації емейлу
+const verifyTemplateSource = await readFile(verifyTemplatePath, 'utf-8'); // <-- читаємо і отримуємо зміст шаблону
+const appDomain = getEnvVar('APP_DOMAIN');
+const jwtSecret = getEnvVar('JWT_SECRET');
+
 export const registerUser = async (payload) => {
   const { email, password } = payload;
   const user = await UserCollection.findOne({ email });
@@ -37,13 +42,50 @@ export const registerUser = async (payload) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
 
-  return UserCollection.create({ ...payload, password: hashPassword });
+  // return UserCollection.create({ ...payload, password: hashPassword });
+  const newUser = await UserCollection.create({
+    ...payload,
+    password: hashPassword,
+  });
+
+  const template = handlebars.compile(verifyTemplateSource); // <-- зі строки робимо хендлбар шаблон
+  const verifyPayload = {
+    email,
+  };
+  const token = jwt.sign(verifyPayload, jwtSecret, { expiresIn: '15m' });
+  const html = template({
+    //  <-- з шаблону отримуємо html
+    verifyLink: `${appDomain}/auth/verify?token=${token}`,
+  });
+
+  const verifyEmail = {
+    to: email,
+    subject: 'Verify email',
+    html,
+  };
+
+  await sendEmail(verifyEmail);
+
+  return newUser;
+};
+
+export const verifyUser = async (token) => {
+  try {
+    const { email } = jwt.verify(token, jwtSecret);
+    await UserCollection.findOneAndUpdate({ email }, { verify: true });
+  } catch (error) {
+    throw createHttpError(401, error.message);
+  }
 };
 
 export const loginUser = async ({ email, password }) => {
   const user = await UserCollection.findOne({ email });
   if (!user) {
     throw createHttpError(401, 'Email or password invalid');
+  }
+
+  if (!user.verify) {
+    throw createHttpError(401, 'Email not verified');
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
@@ -95,7 +137,7 @@ export const sendResetToken = async (email) => {
       sub: user._id,
       email,
     },
-    getEnvVar('JWT_SECRET'),
+    jwtSecret,
     {
       expiresIn: '15m',
     },
@@ -114,7 +156,7 @@ export const sendResetToken = async (email) => {
   const template = handlebars.compile(resetTemplateSource);
   const html = template({
     name: user.name,
-    resetLink: `${getEnvVar('APP_DOMAIN')}/reset-password?token=${resetToken}`,
+    resetLink: `${appDomain}/reset-password?token=${resetToken}`,
   });
 
   await sendEmail({
@@ -129,7 +171,7 @@ export const resetPassword = async (payload) => {
   let entries;
 
   try {
-    entries = jwt.verify(payload.token, getEnvVar('JWT_SECRET'));
+    entries = jwt.verify(payload.token, jwtSecret);
   } catch (err) {
     if (err instanceof Error) throw createHttpError(401, err.message);
     throw err;

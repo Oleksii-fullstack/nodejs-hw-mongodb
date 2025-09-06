@@ -4,7 +4,7 @@ import createHttpError from 'http-errors';
 import { TEMP_UPLOAD_DIR } from '../constants/index.js';
 
 const storage = multer.diskStorage({
-  //   destination: TEMP_UPLOAD_DIR,  <-- якщо немає жодних перевірок, всі файли зберіг в папці
+  //   destination: TEMP_UPLOAD_DIR,  <-- якщо немає жодних перевірок і всі файли зберіг в папці
   destination: (req, file, cb) => {
     cb(null, TEMP_UPLOAD_DIR);
   },
