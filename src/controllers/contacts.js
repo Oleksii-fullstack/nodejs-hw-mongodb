@@ -65,6 +65,7 @@ export const upsertContactController = async (req, res) => {
   const { isNew, contact } = await updateContact(
     { _id, userId },
     { ...req.body, userId },
+    req.file,
     {
       upsert: true,
     },
@@ -82,7 +83,7 @@ export const upsertContactController = async (req, res) => {
 export const patchContactByIdController = async (req, res) => {
   const { contactId: _id } = req.params;
   const { _id: userId } = req.user;
-  const result = await updateContact({ _id, userId }, req.body);
+  const result = await updateContact({ _id, userId }, req.body, req.file);
 
   if (!result) {
     throw createHttpError(404, 'Contact not found');

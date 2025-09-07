@@ -12,8 +12,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async (options) => {
-  return await transporter.sendMail(options);
+export const sendEmail = (payload) => {
+  const from = getEnvVar('SMTP_FROM');
+  const email = { ...payload, from };
+  return transporter.sendMail(email);
 };
 
 // import nodemailer from 'nodemailer';

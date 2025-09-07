@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises';
 import ContactCollection from '../db/models/Contact.js';
 
 import { calcPaginationData } from '../utils/calcPaginationData.js';
@@ -64,7 +65,43 @@ export const addContact = async (payload, file) => {
   return ContactCollection.create({ ...payload, photo });
 };
 
-export const updateContact = async (query, payload, options = {}) => {
+// export const updateContact = async (query, payload, options = {}) => {
+//   const result = await ContactCollection.findOneAndUpdate(query, payload, {
+//     includeResultMetadata: true,
+//     ...options,
+//   });
+
+//   if (!result || !result.value) return null;
+
+//   const isNew = Boolean(result.lastErrorObject.upserted);
+
+//   return {
+//     isNew,
+//     contact: result.value,
+//   };
+// };
+
+export const updateContact = async (query, payload, file, options = {}) => {
+  const existed = await ContactCollection.findOne(query);
+
+  if (!existed && !options.upsert) return null;
+
+  let nextPhoto = existed?.photo ?? null;
+
+  if (file) {
+    if (enableCloudinary) {
+      nextPhoto = await saveFileToCloudinary(file);
+      if (file.path) {
+        try {
+          await fs.unlink(file.path);
+        } catch {}
+      }
+    } else {
+      nextPhoto = await saveFileToPublicDir(file);
+    }
+    payload = { ...payload, photo: nextPhoto };
+  }
+
   const result = await ContactCollection.findOneAndUpdate(query, payload, {
     includeResultMetadata: true,
     ...options,
@@ -72,12 +109,10 @@ export const updateContact = async (query, payload, options = {}) => {
 
   if (!result || !result.value) return null;
 
-  const isNew = Boolean(result.lastErrorObject.upserted);
+  const isNew = Boolean(result.lastErrorObject?.upserted);
+  const contact = result.value;
 
-  return {
-    isNew,
-    contact: result.value,
-  };
+  return { isNew, contact };
 };
 
 export const deleteContact = (query) =>
