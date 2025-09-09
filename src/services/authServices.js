@@ -9,6 +9,11 @@ import handlebars from 'handlebars';
 import { SMTP } from '../constants/index.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { sendEmail } from '../utils/sendEmail.js';
+import {
+  validateGoogleOAuthCode,
+  getFullNameFromGooglePayload,
+} from '../utils/googleOAuth2.js';
+
 import { TEMPLATES_DIR } from '../constants/index.js';
 
 import SessionCollection from '../db/models/Session.js';
@@ -192,4 +197,30 @@ export const resetPassword = async (payload) => {
     { _id: user._id },
     { password: encryptedPassword },
   );
+};
+
+export const loginWithGoogleOAuth = async (code) => {
+  const loginTicket = await validateGoogleOAuthCode(code); //  <--- чи валідний код
+  const payload = loginTicket.getPayload(); //  <--- замість деструктуризації
+  if (!payload) throw createHttpError(401, 'Google payload missing');
+
+  let user = await findUser({ email: payload.email }); //  <--- чи є така людина в базі
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10).toString('base64'), 10);
+    const name = getFullNameFromGooglePayload(payload);
+    user = await UserCollection.create({
+      name,
+      email: payload.email,
+      password,
+    });
+  }
+
+  await SessionCollection.findOneAndDelete({ userId: user._id });
+
+  const session = createSession();
+
+  return SessionCollection.create({
+    userId: user._id,
+    ...session,
+  });
 };
