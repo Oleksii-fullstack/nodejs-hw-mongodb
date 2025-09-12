@@ -1,0 +1,62 @@
+tags:
+  - Auth
+summary: Login
+operationId: login
+description: 'Login with email and password. On success returns accessToken and sets HttpOnly cookies (refreshToken, sessionId).'
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [email, password]
+        properties:
+          email:
+            type: string
+            format: email
+            example: 'john@mail.com'
+          password:
+            type: string
+            minLength: 6
+            format: password
+            example: 'P@ssw0rd!'
+responses:
+  '200':
+    description: Successfully logged in an user!
+    headers:
+      Set-Cookie:
+        description: >
+          Two HttpOnly cookies are set: `refreshToken` and `sessionId`.
+          The `Set-Cookie` header may appear **twice** in the response.
+        schema:
+          type: string
+        examples:
+          refreshToken:
+            value: 'refreshToken=eyJ...; HttpOnly; Path=/; Expires=Tue, 31 Dec 2030 23:59:59 GMT'
+          sessionId:
+            value: 'sessionId=66f0b9...; HttpOnly; Path=/; Expires=Tue, 31 Dec 2030 23:59:59 GMT'
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully logged in an user!'
+            data:
+              type: object
+              required: [accessToken]
+              properties:
+                accessToken:
+                  type: string
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml

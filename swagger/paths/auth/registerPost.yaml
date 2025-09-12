@@ -1,0 +1,51 @@
+tags:
+  - Auth
+summary: Register user
+operationId: register
+description: 'Register a new user and send a verification email. Returns 201 without data payload.'
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - email
+          - password
+        properties:
+          name:
+            type: string
+            example: 'John Doe'
+          email:
+            type: string
+            format: email
+            description: 'Must match server-side pattern (emailRegexp)'
+            example: 'john@mail.com'
+          password:
+            type: string
+            minLength: 6
+            format: password
+            example: 'P@ssw0rd!'
+responses:
+  '201':
+    description: Successfully registered a user (verification email sent)
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: 'Successfully registered a user!'
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '409':
+    $ref: ../../components/responses/409.yaml

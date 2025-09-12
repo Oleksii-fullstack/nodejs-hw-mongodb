@@ -1,0 +1,81 @@
+tags:
+  - Contacts
+summary: Upsert contact
+operationId: upsertContact
+description: 'Create or replace contact by id. If contact exists — updates it (200), otherwise creates a new one (201).'
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+      example: '65ca67e7ae7f10c88b598384'
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required: [name, phoneNumber, contactType]
+        properties:
+          name:
+            type: string
+            minLength: 3
+            maxLength: 20
+            example: 'John Doe'
+          phoneNumber:
+            type: string
+            example: '+380501234567'
+          email:
+            type: string
+            example: 'john@mail.com'
+          isFavourite:
+            type: boolean
+            example: false
+          contactType:
+            type: string
+            enum: ['work', 'home', 'personal']
+            example: 'work'
+          photo:
+            description: "Contact's photo"
+            type: string
+            format: binary
+responses:
+  '200':
+    description: Successfully upserted (updated existing contact)
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully upsert contact with id=65ca67e7ae7f10c88b598384'
+            data:
+              $ref: '../../../components/schemas/contact.yaml'
+  '201':
+    description: Successfully upserted (created new contact)
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: 'Successfully upsert contact with id=65ca67e7ae7f10c88b598384'
+            data:
+              $ref: '../../../components/schemas/contact.yaml'
+  '400':
+    $ref: '../../../components/responses/400.yaml'
+  '401':
+    $ref: '../../../components/responses/401.yaml'

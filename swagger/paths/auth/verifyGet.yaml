@@ -1,0 +1,28 @@
+tags:
+  - Auth
+summary: Verify email
+operationId: verifyEmail
+description: 'Verify user email by token'
+security: []
+parameters:
+  - in: query
+    name: token
+    required: true
+    schema:
+      type: string
+      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+responses:
+  '200':
+    description: Email verified
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              example: 'User verified successfully'
+  '401':
+    $ref: ../../components/responses/401.yaml

@@ -23,12 +23,42 @@ paths:
   /contacts/{contactId}:
     get:
       $ref: ../swagger/paths/contacts/{id}/get.yaml
+    put:
+      $ref: ../swagger/paths/contacts/{id}/put.yaml
     patch:
       $ref: ../swagger/paths/contacts/{id}/patch.yaml
     delete:
       $ref: ../swagger/paths/contacts/{id}/delete.yaml
+  /auth/register:
+    post:
+      $ref: ../swagger/paths/auth/registerPost.yaml
+  /auth/verify:
+    get:
+      $ref: ../swagger/paths/auth/verifyGet.yaml
+  /auth/login:
+    post:
+      $ref: ../swagger/paths/auth/loginPost.yaml
+  /auth/refresh:
+    post:
+      $ref: ../swagger/paths/auth/refreshPost.yaml
+  /auth/logout:
+    post:
+      $ref: ../swagger/paths/auth/logoutPost.yaml
+  /auth/send-reset-email:
+    post:
+      $ref: ../swagger/paths/auth/sendResetEmailPost.yaml
+  /auth/reset-pwd:
+    post:
+      $ref: ../swagger/paths/auth/resetPwdPost.yaml
+  /auth/google/get-oauth-url:
+    get:
+      $ref: ../swagger/paths/auth/googleGetOauthUrl.yaml
+  /auth/google/confirm-oauth:
+    post:
+      $ref: ../swagger/paths/auth/googleConfirmOauthPost.yaml
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT

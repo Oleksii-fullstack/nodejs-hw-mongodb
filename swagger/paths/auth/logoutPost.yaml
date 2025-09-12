@@ -1,0 +1,26 @@
+tags:
+  - Auth
+summary: Logout
+operationId: logout
+description: 'Invalidate current session. Clears refreshToken and sessionId cookies.'
+security: []
+parameters:
+  - in: cookie
+    name: refreshToken
+    required: false
+    schema:
+      type: string
+      example: 'eyJhbGciOi...'
+  - in: cookie
+    name: sessionId
+    required: false
+    schema:
+      type: string
+      example: '66f0b9d1c2a4e9f1a1234567'
+responses:
+  '204':
+    description: Successfully logged out (no content)
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '401':
+    $ref: ../../components/responses/401.yaml

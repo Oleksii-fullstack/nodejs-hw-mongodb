@@ -1,0 +1,56 @@
+tags:
+  - Auth
+summary: Refresh session
+operationId: refreshSession
+description: 'Exchange cookies (refreshToken, sessionId) for a new accessToken. Also sets new HttpOnly cookies.'
+security:
+  - bearerAuth: []
+parameters:
+  - in: cookie
+    name: refreshToken
+    required: true
+    schema:
+      type: string
+      example: 'eyJhbGciOi...'
+  - in: cookie
+    name: sessionId
+    required: true
+    schema:
+      type: string
+      example: '66f0b9d1c2a4e9f1a1234567'
+responses:
+  '200':
+    description: Successfully refreshed a session
+    headers:
+      Set-Cookie:
+        description: >
+          Two HttpOnly cookies are set: `refreshToken` and `sessionId`.
+          The `Set-Cookie` header may appear **twice** in the response.
+        schema:
+          type: string
+        examples:
+          refreshToken:
+            value: 'refreshToken=eyJ...; HttpOnly; Path=/; Expires=Tue, 31 Dec 2030 23:59:59 GMT'
+          sessionId:
+            value: 'sessionId=66f0b9...; HttpOnly; Path=/; Expires=Tue, 31 Dec 2030 23:59:59 GMT'
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Successfully refreshed a session!'
+            data:
+              type: object
+              required: [accessToken]
+              properties:
+                accessToken:
+                  type: string
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  '401':
+    $ref: ../../components/responses/401.yaml

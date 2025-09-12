@@ -1,0 +1,41 @@
+tags:
+  - Auth
+summary: Send reset password email
+operationId: sendResetEmail
+description: 'Send password reset email with a short-lived token'
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [email]
+        properties:
+          email:
+            type: string
+            format: email
+            example: 'john@mail.com'
+responses:
+  '200':
+    description: Email sent
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [status, message, data]
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: 'Reset password email has been successfully sent.'
+            data:
+              type: object
+              example: {}
+  '400':
+    $ref: ../../components/responses/400.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
