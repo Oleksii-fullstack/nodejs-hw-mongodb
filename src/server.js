@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { logger } from './middlewares/logger.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 import authRouter from './routers/authRouter.js';
 import contactsRouter from './routers/contacts.js';
@@ -18,6 +19,7 @@ export const setupServer = () => {
   app.use(express.static('public'));
   app.use(logger);
 
+  app.use('/api-docs', swaggerDocs());
   app.use('/auth', authRouter);
   app.use('/contacts', contactsRouter);
 
